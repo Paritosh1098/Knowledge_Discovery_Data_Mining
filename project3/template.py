@@ -23,7 +23,6 @@ output_classes_x_hot = keras.utils.to_categorical(output_classes, num_classes=10
 #initialize map with empty array
 mapOflablesWithImages = {k: [] for k in range(10)}
 index = 0
-print(mapOflablesWithImages[index])
 
 #fill the map
 for label in labels:
@@ -44,14 +43,14 @@ for x in range(0,10):
 
     for j in range(0, int (noOfDataInstances[x] * 0.6)):
         training_images.append(mapOflablesWithImages[x][j])
-        training_lables.append(x)
+        training_lables.append(output_classes_x_hot[x])
     for j in range(int(noOfDataInstances[x] * 0.6) + 1 , int(noOfDataInstances[x] * 0.75)):
         validation_images.append(mapOflablesWithImages[x][j])
-        validation_lables.append(x)
+        validation_lables.append(output_classes_x_hot[x])
 
     for j in range(int (noOfDataInstances[x] * 0.75) + 1 , noOfDataInstances[x]):
         test_images.append(mapOflablesWithImages[x][j])
-        test_lables.append(x)
+        test_lables.append(output_classes_x_hot[x])
 
 # ============ Sampling done ! =============#
 
@@ -61,13 +60,12 @@ for x in range(0,10):
 #test_images, test_lables = (list(t) for t in zip(*sorted(zip(test_images, test_lables))))
 
 # =============Preprocessing Done ===============#
-print(training_images[0])
 
-
+print(training_lables[0])
 # Model Template
 
 model = Sequential() # declare model
-model.add(Dense(10, input_shape=(28*28, ), kernel_initializer='he_normal')) # first layer
+model.add(Dense(10, input_shape=(28*28,), kernel_initializer='he_normal')) # first layer
 model.add(Activation('relu'))
 #
 #
@@ -90,6 +88,13 @@ model.compile(optimizer='sgd',
               metrics=['accuracy'])
 
 # Train Model
+training_images = np.array(training_images)
+training_lables = np.array(training_lables)
+validation_images = np.array(validation_images)
+validation_lables = np.array(validation_lables)
+test_images = np.array(test_images)
+test_lables = np.array(test_lables)
+
 history = model.fit(training_images, training_lables,
                     validation_data = (validation_images, validation_lables),
                     epochs=10,
@@ -99,4 +104,5 @@ history = model.fit(training_images, training_lables,
 # Report Results
 
 print(history.history)
-model.predict()
+print(test_lables[0])
+print(model.predict(test_images))
